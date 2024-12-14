@@ -8,16 +8,20 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 
 public class InventoryManager {
-  
+
     private static final int INVENTORY_SIZE = 41;
-    
+
     public static String saveItems(@NotNull Player player, @NotNull PlayerInventory playerInventory) {
         ItemStack[] items = new ItemStack[INVENTORY_SIZE];
 
         for (int i = 0; i < items.length; i++) {
-            items[i] = playerInventory.getItem(i);
+            ItemStack item = playerInventory.getItem(i);
+
+            if (ExclusionManager.isNotExcluded(item)) {
+                items[i] = playerInventory.getItem(i);
+            }
         }
-        
+
         return BukkitSerialization.itemStackArrayToBase64(items);
     }
 
@@ -32,7 +36,9 @@ public class InventoryManager {
         int i = 0;
         while (i <= 40) {
             if (!(items[i] == null)) {
-                player.getInventory().setItem(i, items[i]);
+                if (ExclusionManager.isNotExcluded(items[i])) {
+                    player.getInventory().setItem(i, items[i]);
+                }
             } else {
                 player.getInventory().setItem(i, null);
             }

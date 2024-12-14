@@ -2,6 +2,7 @@ package hd.sphinx.sync;
 
 import hd.sphinx.sync.listener.*;
 import hd.sphinx.sync.util.ConfigManager;
+import hd.sphinx.sync.util.ExclusionManager;
 import hd.sphinx.sync.util.Updater;
 import hd.sphinx.sync.util.scheduler.SchedulerManager;
 import org.bstats.bukkit.Metrics;
@@ -67,6 +68,13 @@ public class Main extends JavaPlugin {
         registerListener();
         MainManageData.initialize();
         Updater.checkForMySQLUpdate();
+
+        if (ExclusionManager.checkForCircleOfImagination()) {
+            logger.log(Level.INFO, "Circle of Imagination is enabled");
+        } else {
+            logger.log(Level.INFO, "Circle of Imagination is not enabled");
+        }
+
         Bukkit.getPluginCommand("sync").setExecutor((CommandExecutor) new MainCommand());
         Bukkit.getPluginCommand("sync").setTabCompleter(new MainCommandTabComplete());
 
