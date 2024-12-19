@@ -20,14 +20,17 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class ManageMySQLData {
-
     public static Boolean isPlayerInDB(Player player) {
+        return isPlayerInDB(player.getUniqueId());
+    }
+
+    public static Boolean isPlayerInDB(UUID playerId) {
         if (!MySQL.isConnected()) {
             MySQL.connectMySQL();
         }
         try {
             PreparedStatement tryPreparedStatement = MySQL.getConnection().prepareStatement("SELECT p.last_joined FROM playerdata as p WHERE p.player_uuid = ?");
-            tryPreparedStatement.setString(1, String.valueOf(player.getUniqueId()));
+            tryPreparedStatement.setString(1, String.valueOf(playerId));
             ResultSet rs = tryPreparedStatement.executeQuery();
             return rs.next();
         } catch (SQLException ignored) {
@@ -60,6 +63,30 @@ public class ManageMySQLData {
                 if (ConfigManager.getBoolean("settings.sending.error")) {
                     player.sendMessage(ConfigManager.getColoredString("messages.error"));
                 }
+            }
+        }
+    }
+
+    public static void generatePlayer(UUID playerId, String playerName) {
+        if (!MySQL.isConnected()) {
+            MySQL.connectMySQL();
+        }
+        if (isPlayerInDB(playerId)) return;
+        try {
+            PreparedStatement preparedStatement = MySQL.getConnection().prepareStatement("INSERT INTO playerdata (player_uuid, player_name, last_joined) VALUES(?,?,?)");
+            preparedStatement.setString(1, String.valueOf(playerId));
+            preparedStatement.setString(2, playerName);
+            java.util.Date dateNow = new Date( );
+            SimpleDateFormat simpleDateFormat =
+                    new SimpleDateFormat ("MM.dd.yyyy 'at' HH:mm:ss z");
+            preparedStatement.setString(3, simpleDateFormat.format(dateNow));
+            preparedStatement.executeUpdate();
+        } catch (SQLException exception) {
+            if (!MySQL.isConnected()) {
+                MySQL.connectMySQL();
+            } else {
+                exception.printStackTrace();
+                Main.logger.warning("Something went wrong with registering a Player!");
             }
         }
     }

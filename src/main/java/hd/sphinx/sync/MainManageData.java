@@ -125,6 +125,14 @@ public class MainManageData {
         }
     }
 
+    public static void generatePlayer(UUID playerId, String playerName) {
+        if (storageType == StorageType.MYSQL) {
+            ManageMySQLData.generatePlayer(playerId, playerName);
+        } else {
+            throw new RuntimeException("Only MySQL supported for generatePlayer(UUID, String) as for now");
+        }
+    }
+
     public static void loadInventory(UUID playerId, PlayerInventory inventory) {
         if (storageType == StorageType.MYSQL) {
             ManageMySQLData.loadInventory(playerId, inventory);
