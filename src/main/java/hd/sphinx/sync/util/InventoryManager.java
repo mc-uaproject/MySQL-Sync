@@ -1,6 +1,5 @@
 package hd.sphinx.sync.util;
 
-import hd.sphinx.sync.Main;
 import org.bukkit.craftbukkit.v1_21_R3.inventory.CraftItemStack;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;

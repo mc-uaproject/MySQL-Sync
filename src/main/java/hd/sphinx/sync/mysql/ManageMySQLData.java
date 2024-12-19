@@ -64,7 +64,7 @@ public class ManageMySQLData {
         }
     }
 
-    public static void loadInventory(UUID playerId, PlayerInventory inventory, Inventory enderChest) {
+    public static void loadInventory(UUID playerId, PlayerInventory inventory) {
         if (!MySQL.isConnected()) {
             MySQL.connectMySQL();
         }
@@ -82,6 +82,27 @@ public class ManageMySQLData {
                     }
                 } catch (Exception ignored) {
                 }
+            }
+        } catch (SQLException exception) {
+            if (!MySQL.isConnected()) {
+                MySQL.connectMySQL();
+            } else {
+                exception.printStackTrace();
+                Main.logger.warning("Something went wrong with loading player inventory!");
+            }
+        }
+    }
+
+    public static void loadEnderChest(UUID playerId, Inventory enderChest) {
+        if (!MySQL.isConnected()) {
+            MySQL.connectMySQL();
+        }
+        try {
+            PreparedStatement preparedStatement = MySQL.getConnection().prepareStatement("SELECT * FROM playerdata as p WHERE p.player_uuid = ?");
+            preparedStatement.setString(1, String.valueOf(playerId));
+            ResultSet resultSet = preparedStatement.executeQuery();
+            String result;
+            if (resultSet.next()) {
                 result = resultSet.getString("enderchest");
                 try {
                     if (result != null) {
@@ -95,7 +116,7 @@ public class ManageMySQLData {
                 MySQL.connectMySQL();
             } else {
                 exception.printStackTrace();
-                Main.logger.warning("Something went wrong with loading player inventory!");
+                Main.logger.warning("Something went wrong with loading player ender chest!");
             }
         }
     }
@@ -199,16 +220,15 @@ public class ManageMySQLData {
         }
     }
 
-    public static void saveInventory(UUID playerId, String invBase64, String ecBase64) {
+    public static void saveInventory(UUID playerId, String invBase64) {
         if (!MySQL.isConnected()) {
             MySQL.connectMySQL();
         }
         try {
-            String statement = "UPDATE playerdata AS p SET p.inventory = ?, p.enderchest = ? WHERE p.player_uuid = ?";
+            String statement = "UPDATE playerdata AS p SET p.inventory = ? WHERE p.player_uuid = ?";
             PreparedStatement preparedStatement = MySQL.getConnection().prepareStatement(statement);
             preparedStatement.setString(1, invBase64);
-            preparedStatement.setString(2, ecBase64);
-            preparedStatement.setString(3, String.valueOf(playerId));
+            preparedStatement.setString(2, String.valueOf(playerId));
             preparedStatement.executeUpdate();
         } catch (SQLException exception) {
             if (!MySQL.isConnected()) {
@@ -216,6 +236,26 @@ public class ManageMySQLData {
             } else {
                 exception.printStackTrace();
                 Main.logger.warning("Something went wrong with saving player inventory!");
+            }
+        }
+    }
+
+    public static void saveEnderChest(UUID playerId, String ecBase64) {
+        if (!MySQL.isConnected()) {
+            MySQL.connectMySQL();
+        }
+        try {
+            String statement = "UPDATE playerdata AS p SET p.enderchest = ? WHERE p.player_uuid = ?";
+            PreparedStatement preparedStatement = MySQL.getConnection().prepareStatement(statement);
+            preparedStatement.setString(1, ecBase64);
+            preparedStatement.setString(2, String.valueOf(playerId));
+            preparedStatement.executeUpdate();
+        } catch (SQLException exception) {
+            if (!MySQL.isConnected()) {
+                MySQL.connectMySQL();
+            } else {
+                exception.printStackTrace();
+                Main.logger.warning("Something went wrong with saving player ender chest!");
             }
         }
     }

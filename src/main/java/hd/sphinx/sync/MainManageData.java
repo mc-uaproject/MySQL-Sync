@@ -125,19 +125,35 @@ public class MainManageData {
         }
     }
 
-    public static void loadInventory(UUID playerId, PlayerInventory inventory, Inventory enderChest) {
+    public static void loadInventory(UUID playerId, PlayerInventory inventory) {
         if (storageType == StorageType.MYSQL) {
-            ManageMySQLData.loadInventory(playerId, inventory, enderChest);
+            ManageMySQLData.loadInventory(playerId, inventory);
         } else {
             throw new RuntimeException("Only MySQL supported for loadInventory as for now");
         }
     }
 
-    public static void saveInventory(UUID playerId, PlayerInventory inventory, Inventory enderChest) {
+    public static void saveInventory(UUID playerId, PlayerInventory inventory) {
         if (storageType == StorageType.MYSQL) {
-            ManageMySQLData.saveInventory(playerId, InventoryManager.saveItems(inventory), InventoryManager.saveEChest(enderChest));
+            ManageMySQLData.saveInventory(playerId, InventoryManager.saveItems(inventory));
         } else {
             throw new RuntimeException("Only MySQL supported for saveInventory as for now");
+        }
+    }
+
+    public static void loadEnderChest(UUID playerId, Inventory enderChest) {
+        if (storageType == StorageType.MYSQL) {
+            ManageMySQLData.loadEnderChest(playerId, enderChest);
+        } else {
+            throw new RuntimeException("Only MySQL supported for loadEnderChest as for now");
+        }
+    }
+
+    public static void saveEnderChest(UUID playerId, Inventory enderChest) {
+        if (storageType == StorageType.MYSQL) {
+            ManageMySQLData.saveEnderChest(playerId, InventoryManager.saveEChest(enderChest));
+        } else {
+            throw new RuntimeException("Only MySQL supported for saveEnderChest as for now");
         }
     }
 
