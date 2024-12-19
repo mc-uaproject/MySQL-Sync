@@ -12,12 +12,15 @@ import hd.sphinx.sync.util.InventoryManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.UUID;
 
 public class MainManageData {
 
@@ -122,6 +125,22 @@ public class MainManageData {
         }
     }
 
+    public static void loadInventory(UUID playerId, PlayerInventory inventory, Inventory enderChest) {
+        if (storageType == StorageType.MYSQL) {
+            ManageMySQLData.loadInventory(playerId, inventory, enderChest);
+        } else {
+            throw new RuntimeException("Only MySQL supported for loadInventory as for now");
+        }
+    }
+
+    public static void saveInventory(UUID playerId, PlayerInventory inventory, Inventory enderChest) {
+        if (storageType == StorageType.MYSQL) {
+            ManageMySQLData.saveInventory(playerId, InventoryManager.saveItems(inventory), InventoryManager.saveEChest(enderChest));
+        } else {
+            throw new RuntimeException("Only MySQL supported for saveInventory as for now");
+        }
+    }
+
     public static void loadPlayer(Player player) {
         if (storageType == StorageType.MYSQL) {
             ManageMySQLData.loadPlayer(player);
@@ -142,9 +161,9 @@ public class MainManageData {
             player.setItemOnCursor(new ItemStack(Material.AIR));
         } catch (Exception ignored) { }
         if (storageType == StorageType.MYSQL) {
-            ManageMySQLData.savePlayer(player, InventoryManager.saveItems(player, player.getInventory()), InventoryManager.saveEChest(player));
+            ManageMySQLData.savePlayer(player, InventoryManager.saveItems(player.getInventory()), InventoryManager.saveEChest(player.getEnderChest()));
         } else if (storageType == StorageType.MONGODB) {
-            ManageMongoData.savePlayer(player, InventoryManager.saveItems(player, player.getInventory()), InventoryManager.saveEChest(player));
+            ManageMongoData.savePlayer(player, InventoryManager.saveItems(player.getInventory()), InventoryManager.saveEChest(player.getEnderChest()));
         }
     }
 
