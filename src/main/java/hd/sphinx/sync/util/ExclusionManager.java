@@ -16,6 +16,10 @@ public class ExclusionManager {
     private static Plugin circleOfImagination;
     private static boolean isCircleOfImaginationLoaded;
 
+    public static boolean isExcluded(ItemStack item) {
+        return !isNotExcluded(item);
+    }
+
     public static boolean isNotExcluded(ItemStack item) {
         if (item == null || item.getType() == Material.AIR) return false;
         if (!checkForCircleOfImagination()) return true;

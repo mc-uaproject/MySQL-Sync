@@ -66,7 +66,7 @@ public class ManageMongoData {
             result = (String) document.get("inventory");
             try {
                 if (result != null && ConfigManager.getBoolean("settings.syncing.inventory")) {
-                    InventoryManager.loadItem(result, player);
+                    InventoryManager.loadItem(result, player.getInventory());
                     syncProfile.setPlayerInventory(player.getInventory());
                     result = null;
                 }
@@ -106,7 +106,7 @@ public class ManageMongoData {
             result = (String) document.get("enderchest");
             try {
                 if (result != null && ConfigManager.getBoolean("settings.syncing.enderchest")) {
-                    InventoryManager.loadEChest(result, player);
+                    InventoryManager.loadEChest(result, player.getEnderChest());
                     syncProfile.setEnderChest(player.getEnderChest());
                     result = null;
                 }
@@ -226,7 +226,7 @@ public class ManageMongoData {
                     new SimpleDateFormat("MM.dd.yyyy G 'at' HH:mm:ss z");
             document.append("last_joined", simpleDateFormat.format(dateNow));
             if (customSyncSettings.isSyncingInventory()) {
-                document.append("inventory", InventoryManager.saveItems(player, player.getInventory()));
+                document.append("inventory", InventoryManager.saveItems(player.getInventory()));
                 syncProfile.setPlayerInventory(player.getInventory());
             }
             if (customSyncSettings.isSyncingGamemode()) {
@@ -242,7 +242,7 @@ public class ManageMongoData {
                 syncProfile.setHunger(player.getFoodLevel());
             }
             if (customSyncSettings.isSyncingEnderchest()) {
-                document.append("enderchest", InventoryManager.saveEChest(player));
+                document.append("enderchest", InventoryManager.saveEChest(player.getEnderChest()));
                 syncProfile.setEnderChest(player.getEnderChest());
             }
             if (customSyncSettings.isSyncingExp()) {
