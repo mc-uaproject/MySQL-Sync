@@ -1,11 +1,15 @@
 package hd.sphinx.sync.util;
 
+import hd.sphinx.sync.Main;
+import org.bukkit.craftbukkit.v1_21_R3.inventory.CraftItemStack;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.craftbukkit.v1_21_R3.inventory.CraftInventoryPlayer;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.function.BiConsumer;
 
 public class InventoryManager {
 
@@ -33,16 +37,13 @@ public class InventoryManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        int i = 0;
-        while (i <= 40) {
-            if (!(items[i] == null)) {
-                if (ExclusionManager.isNotExcluded(items[i])) {
-                    inventory.setItem(i, items[i]);
-                }
+        BiConsumer<Integer, ItemStack> setItem = getSetItem(inventory);
+        for (int i = 0; i <= 40; i++) {
+            if (items[i] == null || ExclusionManager.isExcluded(items[i])) {
+                setItem.accept(i, null);
             } else {
-                inventory.setItem(i, null);
+                setItem.accept(i, items[i]);
             }
-            i++;
         }
     }
 
@@ -64,14 +65,18 @@ public class InventoryManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        BiConsumer<Integer, ItemStack> setItem = getSetItem(enderChest);
         int i = 0;
         while (i <= 26) {
-            if (items[i] != null) {
-                enderChest.setItem(i, items[i]);
-            } else {
-                enderChest.setItem(i, null);
-            }
+            setItem.accept(i, items[i]);
             i++;
         }
+    }
+
+    private static BiConsumer<Integer, ItemStack> getSetItem(Inventory inventory) {
+        if (inventory instanceof CraftInventoryPlayer craftInventoryPlayer) {
+            return (i, item) -> craftInventoryPlayer.getInventory().setItem(i, CraftItemStack.asNMSCopy(item));
+        }
+        return inventory::setItem;
     }
 }
