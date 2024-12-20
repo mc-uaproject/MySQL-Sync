@@ -27,6 +27,11 @@ public class JoinListener implements Listener {
         MainManageData.commandHashMap.put(player, new ArrayList<String>());
         if (DeathListener.deadPlayers.contains(player)) {
             DeathListener.deadPlayers.remove(player);
+            if (player.getRespawnLocation() != null) {
+                player.teleport(player.getRespawnLocation());
+            } else {
+                player.teleport(Bukkit.getWorlds().getFirst().getSpawnLocation());
+            }
         }
         if (!MainManageData.isPlayerKnown(player)) {
             if (ConfigManager.getBoolean("settings.sending.generated")) {
