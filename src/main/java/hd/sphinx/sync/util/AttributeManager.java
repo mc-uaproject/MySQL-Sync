@@ -11,7 +11,7 @@ import org.bukkit.attribute.AttributeModifier;
 public class AttributeManager {
     public static String saveAttributes(Attributable entity) {
         StringBuilder result = new StringBuilder();
-        for (Attribute attr : Attribute.values()) {
+        for (Attribute attr : Registry.ATTRIBUTE) {
             AttributeInstance instance = entity.getAttribute(attr);
             if (instance != null) {
                 result.append(attr.getKey().getNamespace());
