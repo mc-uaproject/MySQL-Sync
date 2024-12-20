@@ -1,5 +1,6 @@
 package hd.sphinx.sync.util;
 
+import hd.sphinx.sync.Main;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.attribute.Attributable;
@@ -42,7 +43,9 @@ public class AttributeManager {
             AttributeInstance instance = entity.getAttribute(attr);
             if (instance == null) continue;
             instance.setBaseValue(Double.parseDouble(values[2]));
-            instance.getModifiers().clear();
+            for (AttributeModifier modifier : instance.getModifiers()) {
+                instance.removeModifier(modifier);
+            }
             for (int i = 3; i < values.length; i += 4) {
                 instance.addModifier(new AttributeModifier(
                         new NamespacedKey(values[i], values[i + 1]),
