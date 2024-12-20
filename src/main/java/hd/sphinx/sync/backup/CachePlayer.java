@@ -1,6 +1,7 @@
 package hd.sphinx.sync.backup;
 
 import hd.sphinx.sync.util.AdvancementManager;
+import hd.sphinx.sync.util.AttributeManager;
 import hd.sphinx.sync.util.StatisticsManager;
 import org.bukkit.GameMode;
 import org.bukkit.advancement.Advancement;
@@ -23,6 +24,7 @@ public class CachePlayer {
     private Integer hunger;
     private Double health;
     private Collection<PotionEffect> effects;
+    private String attributesData;
     private HashMap<Advancement, Boolean> advancements;
     private HashMap<String, Integer> statistics;
 
@@ -35,6 +37,7 @@ public class CachePlayer {
         this.hunger = player.getFoodLevel();
         this.health = player.getHealth();
         this.effects = player.getActivePotionEffects();
+        this.attributesData = AttributeManager.saveAttributes(player);
         this.advancements = AdvancementManager.getAdvancementMap(player);
         this.statistics = StatisticsManager.getStatisticsMap(player);
     }
@@ -125,6 +128,12 @@ public class CachePlayer {
 
     public Boolean compareEffects(Collection<PotionEffect> effects) {
         return this.effects == effects;
+    }
+
+    public void setAttributesData(String data) { this.attributesData = data; }
+
+    public Boolean compareAttributes(String savedAttributes) {
+        return this.attributesData.equals(savedAttributes);
     }
 
     public void setAdvancements(HashMap<Advancement, Boolean> advancements) {

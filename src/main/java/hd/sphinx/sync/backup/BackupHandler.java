@@ -3,6 +3,7 @@ package hd.sphinx.sync.backup;
 import hd.sphinx.sync.Main;
 import hd.sphinx.sync.MainManageData;
 import hd.sphinx.sync.util.AdvancementManager;
+import hd.sphinx.sync.util.AttributeManager;
 import hd.sphinx.sync.util.ConfigManager;
 import hd.sphinx.sync.util.StatisticsManager;
 import org.bukkit.Bukkit;
@@ -26,6 +27,7 @@ public class BackupHandler {
         Boolean hunger = getSaveBool("hunger");
         Boolean health = getSaveBool("health");
         Boolean effects = getSaveBool("effects");
+        Boolean attributes = getSaveBool("attributes");
         Boolean advancements = getSaveBool("advancements");
         Boolean statistics = getSaveBool("statistics");
         HashMap<Player, CachePlayer> playerCache = new HashMap<Player, CachePlayer>();
@@ -65,6 +67,10 @@ public class BackupHandler {
             if (effects && !cachePlayer.compareEffects(player.getActivePotionEffects())) {
                 cachePlayer.setEffects(player.getActivePotionEffects());
                 customSyncSettings.setSyncingEffects(true);
+            }
+            if (attributes && !cachePlayer.compareAttributes(AttributeManager.saveAttributes(player))) {
+                cachePlayer.setAttributesData(AttributeManager.saveAttributes(player));
+                customSyncSettings.setSyncingAttributes(true);
             }
             if (advancements && !cachePlayer.compareAdvancements(AdvancementManager.getAdvancementMap(player))) {
                 cachePlayer.setAdvancements(AdvancementManager.getAdvancementMap(player));

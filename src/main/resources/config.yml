@@ -23,6 +23,7 @@ settings:
     hunger: true # Syncing Hunger between the Servers
     health: true # Syncing Health between the Servers
     effects: true # Syncing Potion Effects between the Servers
+    attributes: true # Syncing Attributes between the Servers
     advancements: false # Syncing ALL Advancements between the Servers (This requires a large MySQL because Minecraft Advancements are giant!)
     statistics: false # Syncing ALL Statistics between the Servers (This requires a large MySQL because Minecraft Statistics are way bigger than the Advancements, and even they are giant!)
   sending:
@@ -42,6 +43,7 @@ settings:
       hunger: true # If the Hunger of the Player should be backed up.
       health: true # If the Health of the Player should be backed up.
       effects: false # If the Effects of the Player should be backed up.
+      attributes: true # If the Attributes of the Player should be backed up.
       advancements: false # If the Advancements of the Player should be backed up.
       statistics: false # If the Statistics of the Player should be backed up.
 
