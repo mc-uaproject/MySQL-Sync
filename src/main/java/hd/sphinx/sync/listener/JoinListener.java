@@ -14,6 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.potion.PotionEffect;
 
 import java.util.ArrayList;
 
@@ -25,8 +26,8 @@ public class JoinListener implements Listener {
         if (ConfigManager.getBoolean("settings.onlySyncPermission") && !player.hasPermission("sync.sync")) return;
         MainManageData.loadedPlayerData.add(player);
         MainManageData.commandHashMap.put(player, new ArrayList<String>());
-        if (DeathListener.deadPlayers.contains(player)) {
-            DeathListener.deadPlayers.remove(player);
+        if (DeathListener.isDead(player)) {
+            DeathListener.removeDeadPlayer(player);
             if (player.getRespawnLocation() != null) {
                 player.teleport(player.getRespawnLocation());
             } else {
@@ -49,6 +50,11 @@ public class JoinListener implements Listener {
                 if (ConfigManager.getBoolean("settings.syncing.exp")) {
                     player.setLevel(0);
                 }
+                if (ConfigManager.getBoolean("settings.syncing.effects")) {
+                    for (PotionEffect effect : player.getActivePotionEffects()) {
+                        player.removePotionEffect(effect.getType());
+                    }
+                }
             }
             return;
         } else {
@@ -61,6 +67,11 @@ public class JoinListener implements Listener {
             if (ConfigManager.getBoolean("settings.syncing.exp")) {
                 player.setLevel(0);
             }
+            if (ConfigManager.getBoolean("settings.syncing.effects")) {
+                for (PotionEffect effect : player.getActivePotionEffects()) {
+                    player.removePotionEffect(effect.getType());
+                }
+            }
         }
         player.sendMessage(ConfigManager.getColoredString("messages.loading"));
         Bukkit.getPluginManager().callEvent(new ProcessingLoadingPlayerDataEvent(player, new SyncSettings()));
@@ -70,7 +81,7 @@ public class JoinListener implements Listener {
     @EventHandler
     public void onPickup(PlayerPickupItemEvent event) {
         if (MainManageData.loadedPlayerData.contains(event.getPlayer())) event.setCancelled(true);
-        if (DeathListener.deadPlayers.contains(event.getPlayer())) event.setCancelled(true);
+        if (DeathListener.isDead(event.getPlayer())) event.setCancelled(true);
     }
 
     @EventHandler
