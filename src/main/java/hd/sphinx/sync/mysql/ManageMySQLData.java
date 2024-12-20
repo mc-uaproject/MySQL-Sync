@@ -9,6 +9,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 
 import java.sql.PreparedStatement;
@@ -18,14 +20,17 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class ManageMySQLData {
-
     public static Boolean isPlayerInDB(Player player) {
+        return isPlayerInDB(player.getUniqueId());
+    }
+
+    public static Boolean isPlayerInDB(UUID playerId) {
         if (!MySQL.isConnected()) {
             MySQL.connectMySQL();
         }
         try {
             PreparedStatement tryPreparedStatement = MySQL.getConnection().prepareStatement("SELECT p.last_joined FROM playerdata as p WHERE p.player_uuid = ?");
-            tryPreparedStatement.setString(1, String.valueOf(player.getUniqueId()));
+            tryPreparedStatement.setString(1, String.valueOf(playerId));
             ResultSet rs = tryPreparedStatement.executeQuery();
             return rs.next();
         } catch (SQLException ignored) {
@@ -62,6 +67,87 @@ public class ManageMySQLData {
         }
     }
 
+    public static void generatePlayer(UUID playerId, String playerName) {
+        if (!MySQL.isConnected()) {
+            MySQL.connectMySQL();
+        }
+        if (isPlayerInDB(playerId)) return;
+        try {
+            PreparedStatement preparedStatement = MySQL.getConnection().prepareStatement("INSERT INTO playerdata (player_uuid, player_name, last_joined) VALUES(?,?,?)");
+            preparedStatement.setString(1, String.valueOf(playerId));
+            preparedStatement.setString(2, playerName);
+            java.util.Date dateNow = new Date( );
+            SimpleDateFormat simpleDateFormat =
+                    new SimpleDateFormat ("MM.dd.yyyy 'at' HH:mm:ss z");
+            preparedStatement.setString(3, simpleDateFormat.format(dateNow));
+            preparedStatement.executeUpdate();
+        } catch (SQLException exception) {
+            if (!MySQL.isConnected()) {
+                MySQL.connectMySQL();
+            } else {
+                exception.printStackTrace();
+                Main.logger.warning("Something went wrong with registering a Player!");
+            }
+        }
+    }
+
+    public static void loadInventory(UUID playerId, PlayerInventory inventory) {
+        if (!MySQL.isConnected()) {
+            MySQL.connectMySQL();
+        }
+        try {
+            PreparedStatement preparedStatement = MySQL.getConnection().prepareStatement("SELECT * FROM playerdata as p WHERE p.player_uuid = ?");
+            preparedStatement.setString(1, String.valueOf(playerId));
+            ResultSet resultSet = preparedStatement.executeQuery();
+            String result;
+            if (resultSet.next()) {
+                result = resultSet.getString("inventory");
+                try {
+                    if (result != null) {
+                        InventoryManager.loadItem(result, inventory);
+                        result = null;
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+        } catch (SQLException exception) {
+            if (!MySQL.isConnected()) {
+                MySQL.connectMySQL();
+            } else {
+                exception.printStackTrace();
+                Main.logger.warning("Something went wrong with loading player inventory!");
+            }
+        }
+    }
+
+    public static void loadEnderChest(UUID playerId, Inventory enderChest) {
+        if (!MySQL.isConnected()) {
+            MySQL.connectMySQL();
+        }
+        try {
+            PreparedStatement preparedStatement = MySQL.getConnection().prepareStatement("SELECT * FROM playerdata as p WHERE p.player_uuid = ?");
+            preparedStatement.setString(1, String.valueOf(playerId));
+            ResultSet resultSet = preparedStatement.executeQuery();
+            String result;
+            if (resultSet.next()) {
+                result = resultSet.getString("enderchest");
+                try {
+                    if (result != null) {
+                        InventoryManager.loadEChest(result, enderChest);
+                        result = null;
+                    }
+                } catch (Exception ignored) { }
+            }
+        } catch (SQLException exception) {
+            if (!MySQL.isConnected()) {
+                MySQL.connectMySQL();
+            } else {
+                exception.printStackTrace();
+                Main.logger.warning("Something went wrong with loading player ender chest!");
+            }
+        }
+    }
+
     public static void loadPlayer(Player player) {
         if (!MySQL.isConnected()) {
             MySQL.connectMySQL();
@@ -76,7 +162,7 @@ public class ManageMySQLData {
                 result = resultSet.getString("inventory");
                 try {
                     if (result != null && ConfigManager.getBoolean("settings.syncing.inventory")) {
-                        InventoryManager.loadItem(result, player);
+                        InventoryManager.loadItem(result, player.getInventory());
                         syncProfile.setPlayerInventory(player.getInventory());
                         result = null;
                     }
@@ -124,7 +210,7 @@ public class ManageMySQLData {
                 result = resultSet.getString("enderchest");
                 try {
                     if (result != null && ConfigManager.getBoolean("settings.syncing.enderchest")) {
-                        InventoryManager.loadEChest(result, player);
+                        InventoryManager.loadEChest(result, player.getEnderChest());
                         syncProfile.setEnderChest(player.getEnderChest());
                         result = null;
                     }
@@ -168,6 +254,46 @@ public class ManageMySQLData {
                 if (ConfigManager.getBoolean("settings.sending.error")) {
                     player.sendMessage(ConfigManager.getColoredString("messages.error"));
                 }
+            }
+        }
+    }
+
+    public static void saveInventory(UUID playerId, String invBase64) {
+        if (!MySQL.isConnected()) {
+            MySQL.connectMySQL();
+        }
+        try {
+            String statement = "UPDATE playerdata AS p SET p.inventory = ? WHERE p.player_uuid = ?";
+            PreparedStatement preparedStatement = MySQL.getConnection().prepareStatement(statement);
+            preparedStatement.setString(1, invBase64);
+            preparedStatement.setString(2, String.valueOf(playerId));
+            preparedStatement.executeUpdate();
+        } catch (SQLException exception) {
+            if (!MySQL.isConnected()) {
+                MySQL.connectMySQL();
+            } else {
+                exception.printStackTrace();
+                Main.logger.warning("Something went wrong with saving player inventory!");
+            }
+        }
+    }
+
+    public static void saveEnderChest(UUID playerId, String ecBase64) {
+        if (!MySQL.isConnected()) {
+            MySQL.connectMySQL();
+        }
+        try {
+            String statement = "UPDATE playerdata AS p SET p.enderchest = ? WHERE p.player_uuid = ?";
+            PreparedStatement preparedStatement = MySQL.getConnection().prepareStatement(statement);
+            preparedStatement.setString(1, ecBase64);
+            preparedStatement.setString(2, String.valueOf(playerId));
+            preparedStatement.executeUpdate();
+        } catch (SQLException exception) {
+            if (!MySQL.isConnected()) {
+                MySQL.connectMySQL();
+            } else {
+                exception.printStackTrace();
+                Main.logger.warning("Something went wrong with saving player ender chest!");
             }
         }
     }
@@ -329,7 +455,7 @@ public class ManageMySQLData {
             int real = 1;
             for (String string : arguments) {
                 if (string.contains("inventory")) {
-                    preparedStatement.setString(real, InventoryManager.saveItems(player, player.getInventory()));
+                    preparedStatement.setString(real, InventoryManager.saveItems(player.getInventory()));
                     syncProfile.setPlayerInventory(player.getInventory());
                 } else if (string.contains("gamemode")) {
                     preparedStatement.setString(real, String.valueOf(player.getGameMode()));
@@ -341,7 +467,7 @@ public class ManageMySQLData {
                     preparedStatement.setInt(real, player.getFoodLevel());
                     syncProfile.setHunger(player.getFoodLevel());
                 } else if (string.contains("enderchest")) {
-                    preparedStatement.setString(real, InventoryManager.saveEChest(player));
+                    preparedStatement.setString(real, InventoryManager.saveEChest(player.getEnderChest()));
                     syncProfile.setEnderChest(player.getEnderChest());
                 } else if (string.contains("exp")) {
                     preparedStatement.setInt(real, player.getLevel());

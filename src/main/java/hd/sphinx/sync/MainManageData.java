@@ -14,12 +14,15 @@ import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.UUID;
 
 public class MainManageData {
 
@@ -124,6 +127,46 @@ public class MainManageData {
         }
     }
 
+    public static void generatePlayer(UUID playerId, String playerName) {
+        if (storageType == StorageType.MYSQL) {
+            ManageMySQLData.generatePlayer(playerId, playerName);
+        } else {
+            throw new RuntimeException("Only MySQL supported for generatePlayer(UUID, String) as for now");
+        }
+    }
+
+    public static void loadInventory(UUID playerId, PlayerInventory inventory) {
+        if (storageType == StorageType.MYSQL) {
+            ManageMySQLData.loadInventory(playerId, inventory);
+        } else {
+            throw new RuntimeException("Only MySQL supported for loadInventory as for now");
+        }
+    }
+
+    public static void saveInventory(UUID playerId, PlayerInventory inventory) {
+        if (storageType == StorageType.MYSQL) {
+            ManageMySQLData.saveInventory(playerId, InventoryManager.saveItems(inventory));
+        } else {
+            throw new RuntimeException("Only MySQL supported for saveInventory as for now");
+        }
+    }
+
+    public static void loadEnderChest(UUID playerId, Inventory enderChest) {
+        if (storageType == StorageType.MYSQL) {
+            ManageMySQLData.loadEnderChest(playerId, enderChest);
+        } else {
+            throw new RuntimeException("Only MySQL supported for loadEnderChest as for now");
+        }
+    }
+
+    public static void saveEnderChest(UUID playerId, Inventory enderChest) {
+        if (storageType == StorageType.MYSQL) {
+            ManageMySQLData.saveEnderChest(playerId, InventoryManager.saveEChest(enderChest));
+        } else {
+            throw new RuntimeException("Only MySQL supported for saveEnderChest as for now");
+        }
+    }
+
     public static void loadPlayer(Player player) {
         if (storageType == StorageType.MYSQL) {
             ManageMySQLData.loadPlayer(player);
@@ -149,9 +192,9 @@ public class MainManageData {
             player.setItemOnCursor(new ItemStack(Material.AIR));
         } catch (Exception ignored) { }
         if (storageType == StorageType.MYSQL) {
-            ManageMySQLData.savePlayer(player, InventoryManager.saveItems(player, player.getInventory()), InventoryManager.saveEChest(player));
+            ManageMySQLData.savePlayer(player, InventoryManager.saveItems(player.getInventory()), InventoryManager.saveEChest(player.getEnderChest()));
         } else if (storageType == StorageType.MONGODB) {
-            ManageMongoData.savePlayer(player, InventoryManager.saveItems(player, player.getInventory()), InventoryManager.saveEChest(player));
+            ManageMongoData.savePlayer(player, InventoryManager.saveItems(player.getInventory()), InventoryManager.saveEChest(player.getEnderChest()));
         }
     }
 
