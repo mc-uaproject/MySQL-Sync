@@ -134,6 +134,9 @@ public class ManageMySQLData {
                     if (result != null && ConfigManager.getBoolean("settings.syncing.effects")) {
                         Collection<PotionEffect> collection = null;
                         collection = Arrays.asList(BukkitSerialization.potionEffectArrayFromBase64(result));
+                        for (PotionEffect effect : player.getActivePotionEffects()) {
+                            player.removePotionEffect(effect.getType());
+                        }
                         player.addPotionEffects(collection);
                         syncProfile.setPotionEffects(collection);
                         result = null;
