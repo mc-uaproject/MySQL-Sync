@@ -3,6 +3,7 @@ package hd.sphinx.sync.listener;
 import hd.sphinx.sync.util.ConfigManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -13,7 +14,7 @@ public class DeathListener implements Listener {
 
     public static ArrayList<Player> deadPlayers = new ArrayList<Player>();
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onDeath(PlayerDeathEvent event) {
         if (ConfigManager.getBoolean("settings.onlySyncPermission") && !event.getEntity().hasPermission("sync.sync")) return;
         deadPlayers.add(event.getEntity());
