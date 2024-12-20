@@ -176,7 +176,7 @@ public class MainManageData {
     }
 
     public static void savePlayer(Player player) {
-        if (DeathListener.deadPlayers.contains(player)) {
+        if (DeathListener.isDead(player)) {
             player.getInventory().clear();
             AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
             if (maxHealth != null) {

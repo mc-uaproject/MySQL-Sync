@@ -25,8 +25,8 @@ public class JoinListener implements Listener {
         if (ConfigManager.getBoolean("settings.onlySyncPermission") && !player.hasPermission("sync.sync")) return;
         MainManageData.loadedPlayerData.add(player);
         MainManageData.commandHashMap.put(player, new ArrayList<String>());
-        if (DeathListener.deadPlayers.contains(player)) {
-            DeathListener.deadPlayers.remove(player);
+        if (DeathListener.isDead(player)) {
+            DeathListener.removeDeadPlayer(player);
             if (player.getRespawnLocation() != null) {
                 player.teleport(player.getRespawnLocation());
             } else {
@@ -70,7 +70,7 @@ public class JoinListener implements Listener {
     @EventHandler
     public void onPickup(PlayerPickupItemEvent event) {
         if (MainManageData.loadedPlayerData.contains(event.getPlayer())) event.setCancelled(true);
-        if (DeathListener.deadPlayers.contains(event.getPlayer())) event.setCancelled(true);
+        if (DeathListener.isDead(event.getPlayer())) event.setCancelled(true);
     }
 
     @EventHandler
