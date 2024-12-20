@@ -175,6 +175,14 @@ public class ManageMySQLData {
                         result = null;
                     }
                 } catch (Exception ignored) { }
+                result = resultSet.getString("attributes");
+                try {
+                    if (result != null && ConfigManager.getBoolean("settings.syncing.attributes")) {
+                        AttributeManager.loadAttributes(player, result);
+                        syncProfile.setAttributesData(result);
+                        result = null;
+                    }
+                } catch (Exception ignored) { }
                 result = resultSet.getString("health");
                 try {
                     if (result != null && ConfigManager.getBoolean("settings.syncing.health")) {
@@ -212,6 +220,9 @@ public class ManageMySQLData {
                     if (result != null && ConfigManager.getBoolean("settings.syncing.effects")) {
                         Collection<PotionEffect> collection = null;
                         collection = Arrays.asList(BukkitSerialization.potionEffectArrayFromBase64(result));
+                        for (PotionEffect effect : player.getActivePotionEffects()) {
+                            player.removePotionEffect(effect.getType());
+                        }
                         player.addPotionEffects(collection);
                         syncProfile.setPotionEffects(collection);
                         result = null;
@@ -315,6 +326,9 @@ public class ManageMySQLData {
             if (ConfigManager.getBoolean("settings.syncing.effects")) {
                 statement = statement + ", p.effects = ?";
             }
+            if (ConfigManager.getBoolean("settings.syncing.attributes")) {
+                statement = statement + ", p.attributes = ?";
+            }
             if (ConfigManager.getBoolean("settings.syncing.advancements")) {
                 statement = statement + ", p.advancements = ?";
             }
@@ -357,6 +371,10 @@ public class ManageMySQLData {
                     PotionEffect[] effectArray = new ArrayList<PotionEffect>(effectCollection).toArray(new PotionEffect[0]);
                     preparedStatement.setString(real, BukkitSerialization.potionEffectArrayToBase64(effectArray));
                     syncProfile.setPotionEffects(effectCollection);
+                } else if (string.contains("attributes")) {
+                    String attributesData = AttributeManager.saveAttributes(player);
+                    preparedStatement.setString(real, attributesData);
+                    syncProfile.setAttributesData(attributesData);
                 } else if (string.contains("advancements")) {
                     HashMap<Advancement, Boolean> advancementMap = AdvancementManager.getAdvancementMap(player);
                     preparedStatement.setString(real, BukkitSerialization.advancementBooleanHashMapToBase64(advancementMap));
@@ -414,6 +432,9 @@ public class ManageMySQLData {
             if (customSyncSettings.isSyncingEffects()) {
                 statement = statement + ", p.effects = ?";
             }
+            if (customSyncSettings.isSyncingAttributes()) {
+                statement = statement + ", p.attributes = ?";
+            }
             if (customSyncSettings.isSyncingAdvancements()) {
                 statement = statement + ", p.advancements = ?";
             }
@@ -456,6 +477,10 @@ public class ManageMySQLData {
                     PotionEffect[] effectArray = new ArrayList<PotionEffect>(effectCollection).toArray(new PotionEffect[0]);
                     preparedStatement.setString(real, BukkitSerialization.potionEffectArrayToBase64(effectArray));
                     syncProfile.setPotionEffects(effectCollection);
+                } else if (string.contains("attributes")) {
+                    String attributesData = AttributeManager.saveAttributes(player);
+                    preparedStatement.setString(real, attributesData);
+                    syncProfile.setAttributesData(attributesData);
                 } else if (string.contains("advancements")) {
                     HashMap<Advancement, Boolean> advancementMap = AdvancementManager.getAdvancementMap(player);
                     preparedStatement.setString(real, BukkitSerialization.advancementBooleanHashMapToBase64(advancementMap));

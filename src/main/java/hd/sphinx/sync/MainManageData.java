@@ -11,6 +11,8 @@ import hd.sphinx.sync.util.ConfigManager;
 import hd.sphinx.sync.util.InventoryManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -176,7 +178,12 @@ public class MainManageData {
     public static void savePlayer(Player player) {
         if (DeathListener.deadPlayers.contains(player)) {
             player.getInventory().clear();
-            player.setHealth(20);
+            AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
+            if (maxHealth != null) {
+                player.setHealth(maxHealth.getValue());
+            } else {
+                player.setHealth(20);
+            }
             player.setFoodLevel(20);
             player.setLevel(0);
         }

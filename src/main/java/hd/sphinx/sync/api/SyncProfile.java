@@ -21,6 +21,7 @@ public class SyncProfile {
     private Integer hunger;
     private Double health;
     private Collection<PotionEffect> potionEffects;
+    private String attributesData;
     private HashMap<Advancement, Boolean> advancements;
     private HashMap<String, Integer> rawStatistics;
 
@@ -55,6 +56,8 @@ public class SyncProfile {
     public void setPotionEffects(Collection<PotionEffect> potionEffects) {
         this.potionEffects = potionEffects;
     }
+
+    public void setAttributesData(String data) { this.attributesData = data; }
 
     public void setAdvancements(HashMap<Advancement, Boolean> advancements) {
         this.advancements = advancements;
@@ -91,6 +94,8 @@ public class SyncProfile {
     public Collection<PotionEffect> getPotionEffects() {
         return potionEffects;
     }
+
+    public String getAttributesData() { return attributesData; }
 
     public HashMap<Advancement, Boolean> getAdvancements() {
         return advancements;

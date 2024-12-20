@@ -8,6 +8,7 @@ public class CustomSyncSettings {
     private Boolean hunger;
     private Boolean health;
     private Boolean effects;
+    private Boolean attributes;
     private Boolean advancements;
     private Boolean statistics;
 
@@ -19,6 +20,7 @@ public class CustomSyncSettings {
         hunger = false;
         health = false;
         effects = false;
+        attributes = false;
         advancements = false;
         statistics = false;
     }
@@ -77,6 +79,14 @@ public class CustomSyncSettings {
 
     public Boolean isSyncingEffects() {
         return effects;
+    }
+
+    public void setSyncingAttributes(Boolean bool) {
+        this.attributes = bool;
+    }
+
+    public Boolean isSyncingAttributes() {
+        return attributes;
     }
 
     public void setSyncingAdvancements(Boolean bool) {
