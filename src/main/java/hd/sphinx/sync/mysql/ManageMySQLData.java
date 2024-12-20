@@ -89,6 +89,14 @@ public class ManageMySQLData {
                         result = null;
                     }
                 } catch (Exception ignored) { }
+                result = resultSet.getString("attributes");
+                try {
+                    if (result != null && ConfigManager.getBoolean("settings.syncing.attributes")) {
+                        AttributeManager.loadAttributes(player, result);
+                        syncProfile.setAttributesData(result);
+                        result = null;
+                    }
+                } catch (Exception ignored) { }
                 result = resultSet.getString("health");
                 try {
                     if (result != null && ConfigManager.getBoolean("settings.syncing.health")) {
@@ -128,14 +136,6 @@ public class ManageMySQLData {
                         collection = Arrays.asList(BukkitSerialization.potionEffectArrayFromBase64(result));
                         player.addPotionEffects(collection);
                         syncProfile.setPotionEffects(collection);
-                        result = null;
-                    }
-                } catch (Exception ignored) { }
-                result = resultSet.getString("attributes");
-                try {
-                    if (result != null && ConfigManager.getBoolean("settings.syncing.attributes")) {
-                        AttributeManager.loadAttributes(player, result);
-                        syncProfile.setAttributesData(result);
                         result = null;
                     }
                 } catch (Exception ignored) { }
