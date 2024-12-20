@@ -5,7 +5,6 @@ import hd.sphinx.sync.MainManageData;
 import hd.sphinx.sync.api.SyncProfile;
 import hd.sphinx.sync.backup.CustomSyncSettings;
 import hd.sphinx.sync.util.*;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.entity.Player;
@@ -220,9 +219,6 @@ public class ManageMySQLData {
                     if (result != null && ConfigManager.getBoolean("settings.syncing.effects")) {
                         Collection<PotionEffect> collection = null;
                         collection = Arrays.asList(BukkitSerialization.potionEffectArrayFromBase64(result));
-                        for (PotionEffect effect : player.getActivePotionEffects()) {
-                            player.removePotionEffect(effect.getType());
-                        }
                         player.addPotionEffects(collection);
                         syncProfile.setPotionEffects(collection);
                         result = null;

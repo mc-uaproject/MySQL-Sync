@@ -14,6 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.potion.PotionEffect;
 
 import java.util.ArrayList;
 
@@ -49,6 +50,11 @@ public class JoinListener implements Listener {
                 if (ConfigManager.getBoolean("settings.syncing.exp")) {
                     player.setLevel(0);
                 }
+                if (ConfigManager.getBoolean("settings.syncing.effects")) {
+                    for (PotionEffect effect : player.getActivePotionEffects()) {
+                        player.removePotionEffect(effect.getType());
+                    }
+                }
             }
             return;
         } else {
@@ -60,6 +66,11 @@ public class JoinListener implements Listener {
             }
             if (ConfigManager.getBoolean("settings.syncing.exp")) {
                 player.setLevel(0);
+            }
+            if (ConfigManager.getBoolean("settings.syncing.effects")) {
+                for (PotionEffect effect : player.getActivePotionEffects()) {
+                    player.removePotionEffect(effect.getType());
+                }
             }
         }
         player.sendMessage(ConfigManager.getColoredString("messages.loading"));
